@@ -91,7 +91,6 @@
 
                     <a href="{{ url('/mahasiswa/pilih-unit') }}" class="btn-action-booking">
                         <span>Pesan Sekarang</span>
-                        <span>&rarr;</span>
                     </a>
                 </article>
 
@@ -123,7 +122,6 @@
 
                     <a href="{{ url('/mahasiswa/pilih-unit') }}" class="btn-action-booking">
                         <span>Pesan Sekarang</span>
-                        <span>&rarr;</span>
                     </a>
                 </article>
 
@@ -153,7 +151,6 @@
 
                     <a href="{{ url('/mahasiswa/pilih-unit') }}" class="btn-action-booking">
                         <span>Pesan Sekarang</span>
-                        <span>&rarr;</span>
                     </a>
                 </article>
 

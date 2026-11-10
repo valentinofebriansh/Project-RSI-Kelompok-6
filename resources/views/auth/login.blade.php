@@ -85,7 +85,6 @@
 
           <div class="btn-action-booking">
             <span>Pesan Sekarang</span>
-            <span>&rarr;</span>
           </div>
         </article>
 
@@ -114,7 +113,6 @@
 
           <div class="btn-action-booking">
             <span>Pesan Sekarang</span>
-            <span>&rarr;</span>
           </div>
         </article>
 
@@ -143,7 +141,6 @@
 
           <div class="btn-action-booking">
             <span>Pesan Sekarang</span>
-            <span>&rarr;</span>
           </div>
         </article>
 
