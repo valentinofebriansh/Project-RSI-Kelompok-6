@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => view('welcome'))->name('home');
 Route::get('/login', fn () => view('auth.login'))->name('login');
 Route::post('/login', fn () => redirect()->route('mahasiswa.dashboard'));
+Route::post('/logout', fn () => redirect()->route('home'))->name('logout');
 
 Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('/dashboard', fn () => view('mahasiswa.dashboard'))->name('dashboard');
