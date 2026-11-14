@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'UI-009: Halaman History Peminjaman (Admin) - Game Corner FILKOM UB')
+@section('title', 'UI-009 & UI-010: Halaman History Peminjaman & Unduh Rekapitulasi (Admin) - Game Corner FILKOM UB')
 
 @section('content')
     <div class="scrollable-content admin-scrollable" id="adminMainContent">
@@ -57,7 +57,7 @@
         <div class="calendar-card-header">
           <div>
             <span class="badge-jadwal-selesai">JADWAL SELESAI</span>
-            <div class="calendar-month-title" style="margin-top: 4px;">Oktober 2026</div>
+            <div class="calendar-month-title" style="margin-top: 3px;">Oktober 2026</div>
           </div>
           <div class="calendar-nav-arrows">
             <button type="button" class="btn-arrow-nav" title="Bulan Sebelumnya">&lt;</button>
@@ -146,9 +146,35 @@
         </p>
       </div>
 
+      <!-- 5. CARD UNDUH DOKUMEN REKAPITULASI HARIAN (UI-010 - Muncul saat tanggal dipilih) -->
+      <div class="download-document-card" id="downloadDocumentCard" style="display: none;">
+        <div class="download-info">
+          <h3>Unduh dokumen</h3>
+          <p id="downloadSubtitle">rekapitulasi harian</p>
+        </div>
+        <div class="download-format-icons">
+          <button type="button" class="format-btn jpg" data-format="JPG" title="Unduh JPG">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>JPG</span>
+          </button>
+          <button type="button" class="format-btn xlsx" data-format="XLSX" title="Unduh XLSX">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+            <span>XLSX</span>
+          </button>
+          <button type="button" class="format-btn csv" data-format="CSV" title="Unduh CSV">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <span>CSV</span>
+          </button>
+          <button type="button" class="format-btn pdf" data-format="PDF" title="Unduh PDF">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <span>PDF</span>
+          </button>
+        </div>
+      </div>
+
     </div>
 
-    <!-- 5. FLOATING BOTTOM NAVIGATION BAR -->
+    <!-- 6. FLOATING BOTTOM NAVIGATION BAR -->
     <div class="bottom-floating-nav-wrapper">
       <nav class="bottom-floating-nav" aria-label="Navigasi Utama Admin">
         <button type="button" class="nav-pill-btn active-history">
@@ -170,3 +196,78 @@
 
     @include('admin.partials.modal_logout')
 @endsection
+
+@push('scripts')
+  <script>
+    (function () {
+      const dateBoxes = document.querySelectorAll('#calendarDatesGrid .date-box');
+      const downloadCard = document.getElementById('downloadDocumentCard');
+      const activityDateTitle = document.getElementById('activityDateTitle');
+      const activityCountBadge = document.getElementById('activityCountBadge');
+      const activityDescription = document.getElementById('activityDescription');
+      const formatButtons = document.querySelectorAll('.format-btn');
+
+      let selectedDate = null;
+
+      function resetBoxAppearance(box) {
+        box.classList.remove('selected');
+        const label = box.querySelector('.selected-label');
+        if (label) label.remove();
+
+        if (box.classList.contains('green') && !box.querySelector('.dot-indicator')) {
+          const dot = document.createElement('span');
+          dot.className = 'dot-indicator';
+          box.appendChild(dot);
+        }
+      }
+
+      dateBoxes.forEach(function (box) {
+        box.addEventListener('click', function () {
+          const clickedDate = box.dataset.date;
+          const isAlreadySelected = box.classList.contains('selected');
+
+          dateBoxes.forEach(resetBoxAppearance);
+
+          // Jika kotak yang sama diklik ulang, kembalikan ke tampilan UI-009
+          if (isAlreadySelected) {
+            selectedDate = null;
+            downloadCard.style.display = 'none';
+            return;
+          }
+
+          // Aktifkan state terpilih (UI-010)
+          selectedDate = clickedDate;
+          const dot = box.querySelector('.dot-indicator');
+          if (dot) dot.remove();
+
+          box.classList.add('selected');
+          const label = document.createElement('span');
+          label.className = 'selected-label';
+          label.textContent = 'Dipilih';
+          box.appendChild(label);
+
+          // Perbarui ringkasan aktivitas sesuai tanggal yang dipilih
+          activityDateTitle.textContent = clickedDate + ' Oktober 2026';
+          if (box.classList.contains('green')) {
+            activityCountBadge.textContent = clickedDate === '18' ? '4 Aktivitas' : '3 Aktivitas';
+            activityDescription.textContent = 'Penyelesaian sewa PlayStation 01, PC Gaming 01, dan Ruang...';
+          } else {
+            activityCountBadge.textContent = '0 Aktivitas';
+            activityDescription.textContent = 'Tidak ada sesi peminjaman tercatat pada tanggal ini.';
+          }
+
+          // Tampilkan panel Unduh Dokumen Rekapitulasi Harian
+          downloadCard.style.display = 'flex';
+        });
+      });
+
+      formatButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const format = btn.dataset.format;
+          const tanggalLabel = selectedDate ? selectedDate + ' Oktober 2026' : '18 Oktober 2026';
+          alert('Mengunduh rekapitulasi harian tanggal ' + tanggalLabel + ' dalam format ' + format + '...');
+        });
+      });
+    })();
+  </script>
+@endpush
