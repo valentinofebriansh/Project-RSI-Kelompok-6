@@ -886,3 +886,90 @@
   background-color: var(--primary-50);
   color: var(--primary-500);
 }
+
+/* ==========================================================
+   TANGGAL TERPILIH & UNDUH DOKUMEN REKAPITULASI (UI-010)
+   ========================================================== */
+.scrollable-content.admin-scrollable {
+  padding-bottom: 96px;
+}
+
+.date-box.selected {
+  background-color: #382AFF !important;
+  color: var(--white);
+}
+
+.date-box .selected-label {
+  font-family: var(--font-caption);
+  font-size: 8.5px;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+/* Card Unduh Dokumen Rekapitulasi Harian */
+.download-document-card {
+  background-color: var(--white);
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.download-info h3 {
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--neutral-900);
+}
+
+.download-info p {
+  font-family: var(--font-caption);
+  font-size: 10px;
+  color: var(--neutral-600);
+}
+
+.download-format-icons {
+  display: flex;
+  gap: 6px;
+}
+
+.format-btn {
+  width: 32px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--neutral-300);
+  background-color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 8px;
+  font-weight: 800;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.format-btn:hover {
+  transform: translateY(-1px);
+}
+
+.format-btn:active {
+  transform: scale(0.96);
+}
+
+.format-btn.jpg { color: #0284C7; border-color: #BAE6FD; background-color: #F0F9FF; }
+.format-btn.xlsx { color: #059669; border-color: #A7F3D0; background-color: #ECFDF5; }
+.format-btn.csv { color: #D97706; border-color: #FDE68A; background-color: #FEF3C7; }
+.format-btn.pdf { color: #DC2626; border-color: #FCA5A5; background-color: #FEF2F2; }
+
+.format-btn svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+}
