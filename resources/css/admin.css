@@ -277,3 +277,408 @@
 .btn-submit-admin:active {
   transform: scale(0.99);
 }
+
+/* ==========================================================
+   TOMBOL LOGOUT TRIGGER ADMIN (UI-007, UI-009, UI-010)
+   ========================================================== */
+.btn-logout-trigger {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: #FEF2F2;
+  border: 1px solid #FECACA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #DC2626;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.btn-logout-trigger:hover {
+  background-color: #FEE2E2;
+  transform: scale(1.05);
+}
+
+.btn-logout-trigger:active {
+  transform: scale(0.95);
+}
+
+/* ==========================================================
+   HALAMAN APPROVAL PENGAJUAN PEMINJAMAN ADMIN (UI-007)
+   ========================================================== */
+.scrollable-content.admin-scrollable {
+  padding-bottom: 90px;
+}
+
+.admin-content-blurred {
+  filter: blur(2px);
+  opacity: 0.35;
+  pointer-events: none;
+  user-select: none;
+}
+
+.page-title-display {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--neutral-900);
+  text-align: center;
+}
+
+/* Filter Dropdowns (Fasilitas & Urutkan dengan .select-wrapper) */
+.filter-dropdowns-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.select-filter-box {
+  width: 100%;
+  padding: 10px 32px 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--neutral-300);
+  background-color: var(--white);
+  font-family: var(--font-caption);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--neutral-800);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.select-chevron-icon {
+  position: absolute;
+  right: 12px;
+  width: 14px;
+  height: 14px;
+  stroke: var(--neutral-600);
+  pointer-events: none;
+}
+
+.section-header-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.section-title-sm {
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--neutral-600);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-count-orange {
+  background-color: #FFF3E0;
+  color: var(--secondary-orange);
+  font-family: var(--font-caption);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.approval-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.approval-card {
+  background-color: var(--white);
+  border: 1px solid var(--neutral-100);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.approval-info-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.unit-time-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unit-code {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--neutral-900);
+}
+
+.time-pill-blue {
+  background-color: var(--primary-50);
+  color: var(--primary-500);
+  font-family: var(--font-caption);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.user-name {
+  font-family: var(--font-heading);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--neutral-900);
+}
+
+.user-nim {
+  font-family: var(--font-caption);
+  font-size: 10.5px;
+  color: var(--neutral-600);
+}
+
+.action-buttons-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-action-reject {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #FCE8E6;
+  border: 1px solid #FCA5A5;
+  color: #EF4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-action-reject:hover {
+  background-color: #F87171;
+  color: var(--white);
+}
+
+.btn-action-approve {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #E6F4EA;
+  border: 1px solid #A7F3D0;
+  color: var(--status-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-action-approve:hover {
+  background-color: var(--status-green);
+  color: var(--white);
+}
+
+/* Floating Bottom Navigation Bar (History & Approval) */
+.bottom-floating-nav-wrapper {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+  pointer-events: none;
+}
+
+.bottom-floating-nav {
+  pointer-events: auto;
+  background-color: #37373D;
+  border-radius: 999px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.nav-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  color: #9CA3AF;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-pill-btn.active {
+  background-color: var(--primary-400);
+  color: var(--white);
+}
+
+.nav-pill-btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+}
+
+/* ==========================================================
+   MODAL OVERLAY & POPUP KONFIRMASI LOGOUT ADMIN (UI-008)
+   ========================================================== */
+.modal-overlay-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 99;
+}
+
+.modal-popup-card {
+  width: 100%;
+  max-width: 340px;
+  background-color: var(--white);
+  border-radius: 24px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: modalPopupScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPopupScale {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.btn-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: var(--neutral-600);
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.btn-modal-close:hover {
+  background-color: var(--neutral-100);
+}
+
+.modal-icon-container {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background-color: #FFF7ED;
+  border: 1px solid #FFEDD5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #EA580C;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--neutral-900);
+  margin-bottom: 8px;
+}
+
+.modal-description {
+  font-family: var(--font-caption);
+  font-size: 11.5px;
+  color: var(--neutral-600);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.modal-action-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-logout-danger {
+  width: 100%;
+  background-color: #EF4444;
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-logout-danger:hover {
+  background-color: #DC2626;
+}
+
+.btn-logout-danger:active {
+  transform: scale(0.99);
+}
+
+.btn-cancel-secondary {
+  width: 100%;
+  background-color: var(--white);
+  color: var(--neutral-800);
+  border: 1px solid var(--neutral-300);
+  border-radius: 12px;
+  padding: 12px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-cancel-secondary:hover {
+  background-color: var(--neutral-100);
+}
