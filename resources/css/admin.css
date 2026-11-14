@@ -682,3 +682,207 @@
 .btn-cancel-secondary:hover {
   background-color: var(--neutral-100);
 }
+
+/* ==========================================================
+   HALAMAN HISTORY PEMINJAMAN ADMIN (UI-009)
+   ========================================================== */
+.select-filter-box.bg-subtle {
+  background-color: #F9FAFB;
+  font-weight: 600;
+}
+
+/* Kalender History Card */
+.calendar-card {
+  background-color: var(--white);
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.calendar-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.badge-jadwal-selesai {
+  background-color: var(--primary-50);
+  color: var(--primary-500);
+  font-family: var(--font-caption);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.calendar-month-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--neutral-900);
+}
+
+.calendar-nav-arrows {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-arrow-nav {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--neutral-300);
+  background-color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--neutral-800);
+}
+
+/* Grid Kalender */
+.calendar-days-header {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--neutral-600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.calendar-dates-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.date-box {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.date-box:active {
+  transform: scale(0.95);
+}
+
+/* Status Warna Tanggal */
+.date-box.green {
+  background-color: #0D4738;
+  color: var(--white);
+}
+
+.date-box.dark {
+  background-color: #334155;
+  color: var(--white);
+}
+
+.date-box.selected {
+  background-color: var(--primary-400);
+  color: var(--white);
+}
+
+.date-box .dot-indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #10B981;
+  position: absolute;
+  bottom: 5px;
+}
+
+/* Legend Kalender */
+.calendar-legend-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--neutral-100);
+  font-family: var(--font-caption);
+  font-size: 10px;
+  color: var(--neutral-600);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-box {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.legend-box.green { background-color: #0D4738; }
+.legend-box.dark { background-color: #334155; }
+.legend-box.blue { background-color: var(--primary-500); }
+
+/* Activity Summary Card */
+.activity-summary-card {
+  background-color: var(--white);
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.activity-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.activity-date-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-heading);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--neutral-900);
+}
+
+.dot-orange {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--secondary-orange);
+}
+
+.activity-description {
+  font-family: var(--font-caption);
+  font-size: 11px;
+  color: var(--neutral-600);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-pill-btn.active-history {
+  background-color: var(--primary-50);
+  color: var(--primary-500);
+}
