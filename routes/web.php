@@ -21,6 +21,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/approval', fn () => view('admin.approval'))->name('approval');
     Route::get('/history', fn () => view('admin.history'))->name('history');
-    Route::get('/operasional', fn () => view('admin.operasional'))->name('operasional');
-    Route::get('/laporan', fn () => view('admin.laporan'))->name('laporan');
 });
