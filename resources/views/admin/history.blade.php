@@ -12,7 +12,7 @@
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
-          <span>13:03 WIB</span>
+          <span>{{ now()->format('H:i') }} WIB</span>
         </div>
 
         <h1 class="page-title-display">History</h1>
@@ -30,11 +30,11 @@
       <!-- 2. FILTER DROPDOWNS -->
       <div class="filter-dropdowns-row">
         <div class="select-wrapper">
-          <select class="select-filter-box bg-subtle" aria-label="Filter Unit">
-            <option value="semua">Semua Unit</option>
-            <option value="ps01">PS-01</option>
-            <option value="ps02">PS-02</option>
-            <option value="pc01">PC Gaming 01</option>
+          <select class="select-filter-box bg-subtle" id="filterUnit" onchange="applyFilters()" aria-label="Filter Unit">
+            <option value="semua" {{ ($unit ?? 'semua') === 'semua' ? 'selected' : '' }}>Semua Unit</option>
+            @foreach ($allUnits as $u)
+              <option value="{{ $u }}" {{ ($unit ?? '') === $u ? 'selected' : '' }}>{{ $u }}</option>
+            @endforeach
           </select>
           <svg class="select-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
@@ -42,9 +42,15 @@
         </div>
 
         <div class="select-wrapper">
-          <select class="select-filter-box bg-subtle" aria-label="Filter Bulan">
-            <option value="okt2026">Oktober 2026</option>
-            <option value="nov2026">November 2026</option>
+          <select class="select-filter-box bg-subtle" id="filterBulan" onchange="changeMonthSelect()" aria-label="Filter Bulan">
+            @for ($m = 1; $m <= 12; $m++)
+              @php
+                $optDate = \Carbon\Carbon::createFromDate($tahun, $m, 1);
+              @endphp
+              <option value="{{ $m }}-{{ $tahun }}" {{ $m == $bulan ? 'selected' : '' }}>
+                {{ $optDate->locale('id')->isoFormat('MMMM') }} {{ $tahun }}
+              </option>
+            @endfor
           </select>
           <svg class="select-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
@@ -57,11 +63,11 @@
         <div class="calendar-card-header">
           <div>
             <span class="badge-jadwal-selesai">JADWAL SELESAI</span>
-            <div class="calendar-month-title" style="margin-top: 3px;">Oktober 2026</div>
+            <div class="calendar-month-title" style="margin-top: 3px;">{{ $monthName }} {{ $tahun }}</div>
           </div>
           <div class="calendar-nav-arrows">
-            <button type="button" class="btn-arrow-nav" title="Bulan Sebelumnya">&lt;</button>
-            <button type="button" class="btn-arrow-nav" title="Bulan Berikutnya">&gt;</button>
+            <button type="button" class="btn-arrow-nav" title="Bulan Sebelumnya" onclick="navigateMonth('{{ $prevDate->month }}', '{{ $prevDate->year }}')">&lt;</button>
+            <button type="button" class="btn-arrow-nav" title="Bulan Berikutnya" onclick="navigateMonth('{{ $nextDate->month }}', '{{ $nextDate->year }}')">&gt;</button>
           </div>
         </div>
 
@@ -76,43 +82,18 @@
 
         <!-- Grid Tanggal -->
         <div class="calendar-dates-grid" id="calendarDatesGrid">
-          <div class="date-box green" data-date="1">1 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="2">2 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="3">3 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="4">4 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="5">5 <span class="dot-indicator"></span></div>
-
-          <div class="date-box green" data-date="6">6 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="7">7 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="8">8 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="9">9 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="10">10 <span class="dot-indicator"></span></div>
-
-          <div class="date-box green" data-date="11">11 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="12">12 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="13">13 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="14">14 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="15">15 <span class="dot-indicator"></span></div>
-
-          <div class="date-box green" data-date="16">16 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="17">17 <span class="dot-indicator"></span></div>
-          <div class="date-box green" data-date="18">18 <span class="dot-indicator"></span></div>
-          <div class="date-box dark" data-date="19">19</div>
-          <div class="date-box dark" data-date="20">20</div>
-
-          <div class="date-box dark" data-date="21">21</div>
-          <div class="date-box dark" data-date="22">22</div>
-          <div class="date-box dark" data-date="23">23</div>
-          <div class="date-box dark" data-date="24">24</div>
-          <div class="date-box dark" data-date="25">25</div>
-
-          <div class="date-box dark" data-date="26">26</div>
-          <div class="date-box dark" data-date="27">27</div>
-          <div class="date-box dark" data-date="28">28</div>
-          <div class="date-box dark" data-date="29">29</div>
-          <div class="date-box dark" data-date="30">30</div>
-
-          <div class="date-box dark" data-date="31">31</div>
+          @for ($d = 1; $d <= $daysInMonth; $d++)
+            @php
+              $dateStr = sprintf('%04d-%02d-%02d', $tahun, $bulan, $d);
+              $hasRes = !empty($reservasiByDate[$dateStr]);
+            @endphp
+            <div class="date-box {{ $hasRes ? 'green' : 'dark' }}" data-date="{{ $dateStr }}" data-day="{{ $d }}">
+              {{ $d }}
+              @if ($hasRes)
+                <span class="dot-indicator"></span>
+              @endif
+            </div>
+          @endfor
         </div>
 
         <!-- Legend -->
@@ -137,13 +118,15 @@
         <div class="activity-card-header">
           <div class="activity-date-title">
             <span class="dot-orange"></span>
-            <span id="activityDateTitle">18 Oktober 2026</span>
+            <span id="activityDateTitle">Pilih tanggal pada kalender</span>
           </div>
-          <span class="badge-count-orange" id="activityCountBadge">4 Aktivitas</span>
+          <span class="badge-count-orange" id="activityCountBadge">0 Tiket</span>
         </div>
-        <p class="activity-description" id="activityDescription">
-          Penyelesaian sewa PlayStation 01, PC Gaming 01, dan Ruang...
-        </p>
+        <div id="activityDetailsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+          <p class="activity-description" id="activityDescription" style="white-space: normal; color: #64748B;">
+            Klik salah satu tanggal pada kalender untuk melihat riwayat tiket reservasi.
+          </p>
+        </div>
       </div>
 
       <!-- 5. CARD UNDUH DOKUMEN REKAPITULASI HARIAN (UI-010 - Muncul saat tanggal dipilih) -->
@@ -157,12 +140,12 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             <span>JPG</span>
           </button>
-          <button type="button" class="format-btn xlsx" data-format="XLSX" title="Unduh XLSX">
+          <button type="button" class="format-btn xlsx" id="btnDownloadXlsx" data-format="XLSX" title="Unduh XLSX">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
             <span>XLSX</span>
           </button>
           <button type="button" class="format-btn csv" data-format="CSV" title="Unduh CSV">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="12 18 12 12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
             <span>CSV</span>
           </button>
           <button type="button" class="format-btn pdf" data-format="PDF" title="Unduh PDF">
@@ -200,12 +183,15 @@
 @push('scripts')
   <script>
     (function () {
+      const reservasiData = @json($reservasiByDate);
       const dateBoxes = document.querySelectorAll('#calendarDatesGrid .date-box');
       const downloadCard = document.getElementById('downloadDocumentCard');
+      const downloadSubtitle = document.getElementById('downloadSubtitle');
       const activityDateTitle = document.getElementById('activityDateTitle');
       const activityCountBadge = document.getElementById('activityCountBadge');
-      const activityDescription = document.getElementById('activityDescription');
-      const formatButtons = document.querySelectorAll('.format-btn');
+      const activityDetailsContainer = document.getElementById('activityDetailsContainer');
+      const btnDownloadXlsx = document.getElementById('btnDownloadXlsx');
+      const otherFormatButtons = document.querySelectorAll('.format-btn:not(.xlsx)');
 
       let selectedDate = null;
 
@@ -221,6 +207,31 @@
         }
       }
 
+      function getStatusBadgeStyle(status) {
+        switch (status) {
+          case 'pending':
+            return 'background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A;';
+          case 'disetujui':
+            return 'background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0;';
+          case 'ditolak':
+            return 'background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA;';
+          case 'selesai':
+            return 'background: #DBEAFE; color: #1E40AF; border: 1px solid #BFDBFE;';
+          default:
+            return 'background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0;';
+        }
+      }
+
+      function formatDateIndo(dateStr) {
+        const parts = dateStr.split('-');
+        const dateObj = new Date(parts[0], parseInt(parts[1], 10) - 1, parts[2]);
+        return dateObj.toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+      }
+
       dateBoxes.forEach(function (box) {
         box.addEventListener('click', function () {
           const clickedDate = box.dataset.date;
@@ -228,14 +239,15 @@
 
           dateBoxes.forEach(resetBoxAppearance);
 
-          // Jika kotak yang sama diklik ulang, kembalikan ke tampilan UI-009
           if (isAlreadySelected) {
             selectedDate = null;
             downloadCard.style.display = 'none';
+            activityDateTitle.textContent = 'Pilih tanggal pada kalender';
+            activityCountBadge.textContent = '0 Tiket';
+            activityDetailsContainer.innerHTML = '<p class="activity-description" style="white-space: normal; color: #64748B;">Klik salah satu tanggal pada kalender untuk melihat riwayat tiket reservasi.</p>';
             return;
           }
 
-          // Aktifkan state terpilih (UI-010)
           selectedDate = clickedDate;
           const dot = box.querySelector('.dot-indicator');
           if (dot) dot.remove();
@@ -246,28 +258,97 @@
           label.textContent = 'Dipilih';
           box.appendChild(label);
 
-          // Perbarui ringkasan aktivitas sesuai tanggal yang dipilih
-          activityDateTitle.textContent = clickedDate + ' Oktober 2026';
-          if (box.classList.contains('green')) {
-            activityCountBadge.textContent = clickedDate === '18' ? '4 Aktivitas' : '3 Aktivitas';
-            activityDescription.textContent = 'Penyelesaian sewa PlayStation 01, PC Gaming 01, dan Ruang...';
+          const formattedDate = formatDateIndo(clickedDate);
+          activityDateTitle.textContent = formattedDate;
+
+          const tickets = reservasiData[clickedDate] || [];
+          activityCountBadge.textContent = tickets.length + ' Tiket';
+
+          if (tickets.length > 0) {
+            let html = '';
+            tickets.forEach(function (t) {
+              const badgeStyle = getStatusBadgeStyle(t.status);
+              html += `
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px 12px; font-size: 11px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <strong style="color: #0F172A; font-size: 12px;">${t.kode_booking}</strong>
+                    <span style="padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; ${badgeStyle}">${t.status.toUpperCase()}</span>
+                  </div>
+                  <div style="color: #1E293B; margin-bottom: 3px; font-weight: 500;">
+                    <span><strong>${t.unit_kode}</strong> (${t.unit_nama})</span> · <span>${t.jam}</span>
+                  </div>
+                  <div style="color: #64748B; font-size: 10.5px;">
+                    ${t.nama} · NIM: ${t.nim} · WA: ${t.no_whatsapp}
+                  </div>
+                </div>
+              `;
+            });
+            activityDetailsContainer.innerHTML = html;
           } else {
-            activityCountBadge.textContent = '0 Aktivitas';
-            activityDescription.textContent = 'Tidak ada sesi peminjaman tercatat pada tanggal ini.';
+            activityDetailsContainer.innerHTML = '<p class="activity-description" style="white-space: normal; color: #64748B;">Tidak ada tiket reservasi pada tanggal ini.</p>';
           }
 
-          // Tampilkan panel Unduh Dokumen Rekapitulasi Harian
           downloadCard.style.display = 'flex';
+          downloadSubtitle.textContent = 'rekapitulasi harian ' + clickedDate;
         });
       });
 
-      formatButtons.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          const format = btn.dataset.format;
-          const tanggalLabel = selectedDate ? selectedDate + ' Oktober 2026' : '18 Oktober 2026';
-          alert('Mengunduh rekapitulasi harian tanggal ' + tanggalLabel + ' dalam format ' + format + '...');
+      // Fungsi pemicu unduh file Excel .xlsx
+      function downloadExcelReport() {
+        const targetDate = selectedDate || '{{ now()->toDateString() }}';
+        const filterUnitEl = document.getElementById('filterUnit');
+        const selectedUnit = filterUnitEl ? filterUnitEl.value : 'semua';
+        const url = new URL("{{ route('admin.history.export') }}", window.location.origin);
+        url.searchParams.set('tanggal', targetDate);
+        if (selectedUnit && selectedUnit !== 'semua') {
+          url.searchParams.set('unit', selectedUnit);
+        }
+        window.location.href = url.toString();
+      }
+
+      // Tombol XLSX: Unduh file Rekap_Reservasi_YYYY-MM-DD.xlsx
+      if (btnDownloadXlsx) {
+        btnDownloadXlsx.addEventListener('click', function (e) {
+          e.stopPropagation();
+          downloadExcelReport();
+        });
+      }
+
+      // Format button lainnya & download card juga mengunduh file rekapitulasi harian tanpa alert
+      otherFormatButtons.forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          downloadExcelReport();
         });
       });
+
+      if (downloadCard) {
+        downloadCard.style.cursor = 'pointer';
+        downloadCard.addEventListener('click', function () {
+          downloadExcelReport();
+        });
+      }
+
+      window.applyFilters = function () {
+        const unit = document.getElementById('filterUnit').value;
+        const bulanTahun = document.getElementById('filterBulan').value.split('-');
+        const url = new URL(window.location.href);
+        url.searchParams.set('unit', unit);
+        url.searchParams.set('bulan', bulanTahun[0]);
+        url.searchParams.set('tahun', bulanTahun[1]);
+        window.location.href = url.toString();
+      };
+
+      window.changeMonthSelect = function () {
+        window.applyFilters();
+      };
+
+      window.navigateMonth = function (m, y) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('bulan', m);
+        url.searchParams.set('tahun', y);
+        window.location.href = url.toString();
+      };
     })();
   </script>
 @endpush

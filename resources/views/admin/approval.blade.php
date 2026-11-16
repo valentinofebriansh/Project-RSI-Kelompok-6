@@ -12,7 +12,7 @@
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            <span>13:03 WIB</span>
+            <span>{{ now()->format('H:i') }} WIB</span>
         </div>
 
         <h1 class="page-title-display">Approval</h1>
@@ -27,15 +27,21 @@
         </button>
     </header>
 
+    @if (session('success'))
+    <div style="padding: 12px 16px; margin: 12px 0; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; color: #065f46; font-size: 13px; font-weight: 500;">
+        {{ session('success') }}
+    </div>
+    @endif
+
     <!-- 2. FILTER DROPDOWNS -->
     <div class="filter-dropdowns-row">
         <div class="select-wrapper">
-            <select class="select-filter-box" aria-label="Filter Fasilitas">
-                <option value="semua">Fasilitas (Semua)</option>
-                <option value="ps">PlayStation</option>
-                <option value="xbox">Xbox</option>
-                <option value="vr">Virtual Reality</option>
-                <option value="piu">Pump It Up</option>
+            <select class="select-filter-box" aria-label="Filter Fasilitas" onchange="applyFilters()" id="filterKategori">
+                <option value="semua" {{ ($kategori ?? 'semua') === 'semua' ? 'selected' : '' }}>Fasilitas (Semua)</option>
+                <option value="ps" {{ ($kategori ?? '') === 'ps' ? 'selected' : '' }}>PlayStation</option>
+                <option value="xbox" {{ ($kategori ?? '') === 'xbox' ? 'selected' : '' }}>Xbox</option>
+                <option value="vr" {{ ($kategori ?? '') === 'vr' ? 'selected' : '' }}>Virtual Reality</option>
+                <option value="piu" {{ ($kategori ?? '') === 'piu' ? 'selected' : '' }}>Pump It Up</option>
             </select>
             <svg class="select-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -43,10 +49,10 @@
         </div>
 
         <div class="select-wrapper">
-            <select class="select-filter-box" aria-label="Urutkan Peminjaman">
-                <option value="waktu">Urutkan: Waktu</option>
-                <option value="terbaru">Urutkan: Terbaru</option>
-                <option value="nama">Urutkan: Nama</option>
+            <select class="select-filter-box" aria-label="Urutkan Peminjaman" onchange="applyFilters()" id="filterUrutan">
+                <option value="waktu" {{ ($urutan ?? 'waktu') === 'waktu' ? 'selected' : '' }}>Urutkan: Waktu</option>
+                <option value="terbaru" {{ ($urutan ?? '') === 'terbaru' ? 'selected' : '' }}>Urutkan: Terbaru</option>
+                <option value="nama" {{ ($urutan ?? '') === 'nama' ? 'selected' : '' }}>Urutkan: Nama</option>
             </select>
             <svg class="select-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -57,161 +63,49 @@
     <!-- 3. SECTION TITLE & COUNTER -->
     <section class="section-header-meta">
         <span class="section-title-sm">MENUNGGU TINJAUAN</span>
-        <span class="badge-count-orange" id="pendingCountBadge">6 Pengajuan</span>
+        <span class="badge-count-orange" id="pendingCountBadge">{{ $reservasis->count() }} Pengajuan</span>
     </section>
 
     <!-- 4. DAFTAR KARTU APPROVAL -->
     <div class="approval-card-list" id="approvalCardList">
 
-        <!-- Item 1: PS-01 M. Rizky Pratama -->
+        @forelse ($reservasis as $item)
         <article class="approval-card">
             <div class="approval-info-left">
                 <div class="unit-time-row">
-                    <span class="unit-code">PS–01</span>
-                    <span class="time-pill-blue">13:00 - 14:00</span>
+                    <span class="unit-code">{{ $item->unit_kode }}</span>
+                    <span class="time-pill-blue">
+                        {{ substr($item->jadwalSlot->jam_mulai ?? '', 0, 5) }} - {{ substr($item->jadwalSlot->jam_selesai ?? '', 0, 5) }}
+                    </span>
                 </div>
-                <span class="user-name">M. Rizky Pratama</span>
-                <span class="user-nim">NIM: 215150201111045</span>
+                <span class="user-name">{{ $item->user->name ?? 'Mahasiswa' }}</span>
+                <span class="user-nim">NIM: {{ $item->user->nim ?? '-' }} · {{ \Carbon\Carbon::parse($item->tanggal_reservasi)->format('d M Y') }}</span>
             </div>
             <div class="action-buttons-right">
-                <button type="button" class="btn-action-reject" title="Tolak" aria-label="Tolak Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-                <button type="button" class="btn-action-approve" title="Setujui" aria-label="Setujui Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                </button>
+                <form action="{{ route('admin.approval.reject', $item->id) }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn-action-reject" title="Tolak" aria-label="Tolak Pengajuan">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </form>
+                <form action="{{ route('admin.approval.approve', $item->id) }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn-action-approve" title="Setujui" aria-label="Setujui Pengajuan">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </button>
+                </form>
             </div>
         </article>
-
-        <!-- Item 2: PS-02 Daffa Ardiansyah -->
-        <article class="approval-card">
-            <div class="approval-info-left">
-                <div class="unit-time-row">
-                    <span class="unit-code">PS–02</span>
-                    <span class="time-pill-blue">13:00 - 14:00</span>
-                </div>
-                <span class="user-name">Daffa Ardiansyah</span>
-                <span class="user-nim">NIM: 225150400111012</span>
-            </div>
-            <div class="action-buttons-right">
-                <button type="button" class="btn-action-reject" title="Tolak" aria-label="Tolak Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-                <button type="button" class="btn-action-approve" title="Setujui" aria-label="Setujui Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                </button>
-            </div>
-        </article>
-
-        <!-- Item 3: PC-01 Siti Nurhaliza -->
-        <article class="approval-card">
-            <div class="approval-info-left">
-                <div class="unit-time-row">
-                    <span class="unit-code">PC–01</span>
-                    <span class="time-pill-blue">14:15 - 15:15</span>
-                </div>
-                <span class="user-name">Siti Nurhaliza</span>
-                <span class="user-nim">NIM: 235150701111089</span>
-            </div>
-            <div class="action-buttons-right">
-                <button type="button" class="btn-action-reject" title="Tolak" aria-label="Tolak Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-                <button type="button" class="btn-action-approve" title="Setujui" aria-label="Setujui Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                </button>
-            </div>
-        </article>
-
-        <!-- Item 4: PS-02 Kevin Sanjaya -->
-        <article class="approval-card">
-            <div class="approval-info-left">
-                <div class="unit-time-row">
-                    <span class="unit-code">PS–02</span>
-                    <span class="time-pill-blue">15:30 - 16:30</span>
-                </div>
-                <span class="user-name">Kevin Sanjaya</span>
-                <span class="user-nim">NIM: 215150307111004</span>
-            </div>
-            <div class="action-buttons-right">
-                <button type="button" class="btn-action-reject" title="Tolak" aria-label="Tolak Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-                <button type="button" class="btn-action-approve" title="Setujui" aria-label="Setujui Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                </button>
-            </div>
-        </article>
-
-        <!-- Item 5: XBOX-01 Ahmad Fauzi -->
-        <article class="approval-card">
-            <div class="approval-info-left">
-                <div class="unit-time-row">
-                    <span class="unit-code">XBOX–01</span>
-                    <span class="time-pill-blue">13:00 - 14:00</span>
-                </div>
-                <span class="user-name">Ahmad Fauzi</span>
-                <span class="user-nim">NIM: 225150600111033</span>
-            </div>
-            <div class="action-buttons-right">
-                <button type="button" class="btn-action-reject" title="Tolak" aria-label="Tolak Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-                <button type="button" class="btn-action-approve" title="Setujui" aria-label="Setujui Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                </button>
-            </div>
-        </article>
-
-        <!-- Item 6: PS-01 Amanda Putri -->
-        <article class="approval-card">
-            <div class="approval-info-left">
-                <div class="unit-time-row">
-                    <span class="unit-code">PS–01</span>
-                    <span class="time-pill-blue">16:45 - 17:45</span>
-                </div>
-                <span class="user-name">Amanda Putri</span>
-                <span class="user-nim">NIM: 235150200111078</span>
-            </div>
-            <div class="action-buttons-right">
-                <button type="button" class="btn-action-reject" title="Tolak" aria-label="Tolak Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-                <button type="button" class="btn-action-approve" title="Setujui" aria-label="Setujui Pengajuan">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                </button>
-            </div>
-        </article>
+        @empty
+        <div style="text-align: center; padding: 40px 20px; color: #64748b;">
+            <p style="font-size: 14px; font-weight: 500;">Tidak ada pengajuan reservasi yang menunggu tinjauan saat ini.</p>
+        </div>
+        @endforelse
 
     </div>
 
@@ -239,3 +133,16 @@
 
 @include('admin.partials.modal_logout')
 @endsection
+
+@push('scripts')
+<script>
+    function applyFilters() {
+        const kategori = document.getElementById('filterKategori').value;
+        const urutan = document.getElementById('filterUrutan').value;
+        const url = new URL("{{ route('admin.approval') }}", window.location.origin);
+        url.searchParams.set('kategori', kategori);
+        url.searchParams.set('urutan', urutan);
+        window.location.href = url.toString();
+    }
+</script>
+@endpush
