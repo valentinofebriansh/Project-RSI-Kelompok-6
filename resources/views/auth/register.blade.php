@@ -51,7 +51,7 @@
                 <line x1="7" y1="9" x2="17" y2="9"></line>
                 <line x1="7" y1="13" x2="13" y2="13"></line>
               </svg>
-              <input type="text" id="txtNim" name="nim" value="{{ old('nim') }}" class="form-input-text" placeholder="Contoh: 255150407111081" required>
+              <input type="text" id="txtNim" name="nim" value="{{ old('nim') }}" class="form-input-text" placeholder="Contoh: 25515040..." required>
             </div>
           </div>
 
