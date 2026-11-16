@@ -8,16 +8,14 @@
 
       <!-- 1. TOPBAR PENGGUNA TERAUTENTIKASI (Kaysan Nawfal) -->
       <header class="topbar-header-auth">
-        <div class="user-profile-meta">
-          <div class="avatar-initial-circle">
-            <span>KN</span>
-            <span class="status-indicator-dot"></span>
-          </div>
-          <div class="user-details">
-            <span class="greeting-small">Selamat Datang,</span>
-            <strong class="user-fullname">Kaysan Nawfal Niscal N.</strong>
-            <span class="user-nim">NIM: 255150407111082</span>
-          </div>
+        <div class="avatar-initial-circle">
+          <span>{{ collect(explode(' ', $user->name))->map(fn($n) => strtoupper(substr($n, 0, 1)))->take(2)->implode('') }}</span>
+          <span class="status-indicator-dot"></span>
+        </div>
+        <div class="user-details">
+          <span class="greeting-small">Selamat Datang,</span>
+          <strong class="user-fullname">{{ $user->name }}</strong>
+          <span class="user-nim">NIM: {{ $user->nim }}</span>
         </div>
 
         <!-- Tombol Logout: Membuka Popup Konfirmasi Logout (UI-003) -->
@@ -31,15 +29,69 @@
       </header>
 
       <!-- 2. STATUS BANNER SESI AKTIF MAHASISWA FILKOM -->
-      <section class="session-status-banner">
-        <div class="banner-top-badges">
-          <span class="badge-sso-pill">SSO Brawijaya Aktif</span>
-          <span class="badge-ticket-pill">1 Tiket Aktif</span>
+      <section class="session-status-banner" style="display: flex; flex-direction: column; gap: 10px; padding: 20px 22px;">
+        @if (session('success'))
+          <div style="background: #DCFCE7; color: #166534; padding: 12px 14px; border-radius: 12px; font-size: 13px; margin-bottom: 4px; font-weight: 600;">
+            {{ session('success') }}
+          </div>
+        @endif
+
+        {{-- Baris Atas: Status Pill Badge dengan 3 Warna --}}
+        <div>
+          @if ($latestReservasi)
+            @if ($latestReservasi->status === 'pending')
+              <span style="display: inline-block; background: #22C55E; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 999px; letter-spacing: 0.3px;">
+                PENDING • Menunggu Persetujuan
+              </span>
+            @elseif ($latestReservasi->status === 'disetujui')
+              <span style="display: inline-block; background: #16A34A; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 999px; letter-spacing: 0.3px;">
+                DISETUJUI • Siap Check-in
+              </span>
+            @elseif ($latestReservasi->status === 'ditolak')
+              <span style="display: inline-block; background: #EF4444; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 999px; letter-spacing: 0.3px;">
+                DITOLAK • Pengajuan Ditolak
+              </span>
+            @else
+              <span style="display: inline-block; background: rgba(255,255,255,0.25); color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 999px; letter-spacing: 0.3px;">
+                {{ strtoupper($latestReservasi->status) }}
+              </span>
+            @endif
+          @else
+            <span style="display: inline-block; background: rgba(255, 255, 255, 0.2); color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 999px; letter-spacing: 0.3px;">
+              BELUM ADA TIKET AKTIF
+            </span>
+          @endif
         </div>
-        <h2 class="banner-faculty-title">Fakultas Ilmu Komputer</h2>
-        <div class="banner-bottom-info">
-          <span>Booking Terakhir: Hari ini, 14:00</span>
-          <span class="link-view-ticket">Lihat Tiket</span>
+
+        {{-- Judul Utama Kartu (Ukuran Besar 20px–22px, Bold, Putih) --}}
+        <h2 style="font-size: 21px; font-weight: 700; color: #FFFFFF; margin: 0; line-height: 1.35; letter-spacing: -0.3px;">
+          @if ($latestReservasi)
+            {{ $latestReservasi->unit_kode }} — {{ $latestReservasi->fasilitas->nama_fasilitas }}
+          @else
+            Belum Ada Reservasi Aktif
+          @endif
+        </h2>
+
+        {{-- Detail Tiket & Keterangan Status di Bagian Bawah Kartu (Ukuran 13px–14px) --}}
+        <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid rgba(255, 255, 255, 0.18); padding-top: 8px;">
+          @if ($latestReservasi)
+            <span style="font-size: 13.5px; color: #FFFFFF; font-weight: 600; line-height: 1.4;">
+              Kode: {{ $latestReservasi->kode_booking }} • {{ \Carbon\Carbon::parse($latestReservasi->tanggal_reservasi)->format('d M Y') }}, {{ substr($latestReservasi->jadwalSlot->jam_mulai, 0, 5) }} - {{ substr($latestReservasi->jadwalSlot->jam_selesai, 0, 5) }} WIB
+            </span>
+            <span style="font-size: 13px; color: rgba(255, 255, 255, 0.85); line-height: 1.4;">
+              @if ($latestReservasi->status === 'disetujui')
+                Tunjukkan KTM ke meja satpam 10 menit sebelum sesi
+              @elseif ($latestReservasi->status === 'ditolak')
+                Pengajuan ditolak admin. Silakan ajukan sesi/unit lain
+              @else
+                Menunggu konfirmasi dari admin Game Corner
+              @endif
+            </span>
+          @else
+            <span style="font-size: 13px; color: rgba(255, 255, 255, 0.85); line-height: 1.4;">
+              Pilih lokasi Game Corner di bawah untuk mulai membuat tiket reservasi.
+            </span>
+          @endif
         </div>
       </section>
 
@@ -58,98 +110,40 @@
           <h2 class="section-title">Lokasi Game Corner</h2>
           <p class="section-subtitle">Pilih spot favorit untuk bermain &amp; relaksasi</p>
         </div>
-        <span class="badge-counter">3 Lokasi Tersedia</span>
+        <span class="badge-counter">{{ count($fasilitas) }} Lokasi Tersedia</span>
       </section>
 
-      <!-- 4. DAFTAR 3 KARTU FASILITAS LENGKAP -->
+      <!-- 4. DAFTAR KARTU FASILITAS LENGKAP -->
       <div class="facility-card-list">
-
-        <!-- KARTU 1: PLAYSTATION & XBOX GEDUNG F -->
-        <article class="facility-card">
-          <div class="card-thumbnail-wrapper">
-            <img class="card-thumbnail-img" src="https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=700&q=80" alt="Ruang Game Corner Gedung F FILKOM UB">
-            <div class="overlay-status-badge">
-              <span class="indicator-dot"></span>
-              <span>Tersedia 4 Slot</span>
+        @foreach ($fasilitas as $item)
+          <article class="facility-card">
+            <div class="card-thumbnail-wrapper">
+              <img class="card-thumbnail-img" src="{{ $item->gambar }}" alt="{{ $item->nama_fasilitas }}">
+              <div class="overlay-status-badge">
+                <span class="indicator-dot"></span>
+                <span>Tersedia {{ count($item->units ?? []) }} Unit</span>
+              </div>
+              @if ($item->is_populer)
+                <span class="overlay-populer-badge">Populer</span>
+              @endif
+              <div class="overlay-location-footer">{{ $item->lokasi }}</div>
             </div>
-            <span class="overlay-populer-badge">Populer</span>
-            <div class="overlay-location-footer">Lantai 2 Gedung F FILKOM UB</div>
-          </div>
 
-          <div class="card-body">
-            <h3 class="card-item-title">Playstation &amp; Xbox Gedung F</h3>
-            <p class="card-item-desc">
-              Dilengkapi sofa santai, TV 4K HDR, serta ragam koleksi game sports, adventure, dan multiplayer terbaru.
-            </p>
-            <div class="card-tags-row">
-              <span class="feature-tag">PS5 DualSense</span>
-              <span class="feature-tag">Xbox Series X</span>
-              <span class="feature-tag">TV 4K 55 Inch</span>
-              <span class="feature-tag">Free WiFi UB</span>
+            <div class="card-body">
+              <h3 class="card-item-title">{{ $item->nama_fasilitas }}</h3>
+              <p class="card-item-desc">{{ $item->deskripsi }}</p>
+              <div class="card-tags-row">
+                @foreach ($item->tags ?? [] as $tag)
+                  <span class="feature-tag">{{ $tag }}</span>
+                @endforeach
+              </div>
             </div>
-          </div>
 
-          <a href="{{ route('mahasiswa.pilih_unit') }}" class="btn-action-booking">
-            <span>Pesan Sekarang</span>
-          </a>
-        </article>
-
-        <!-- KARTU 2: VIRTUAL REALITY GEDUNG F -->
-        <article class="facility-card">
-          <div class="card-thumbnail-wrapper">
-            <img class="card-thumbnail-img" src="https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=700&q=80" alt="Virtual Reality Gedung F FILKOM UB">
-            <div class="overlay-status-badge amber">
-              <span class="indicator-dot"></span>
-              <span>1 Slot Tersisa</span>
-            </div>
-            <div class="overlay-location-footer">Lantai 2 Gedung F FILKOM UB</div>
-          </div>
-
-          <div class="card-body">
-            <h3 class="card-item-title">Virtual Reality Gedung F</h3>
-            <p class="card-item-desc">
-              Eksplorasi simulasi interaktif 3D &amp; game metaverse mutakhir dengan sensor pelacak gerak presisi tinggi.
-            </p>
-            <div class="card-tags-row">
-              <span class="feature-tag">Meta Quest 3</span>
-              <span class="feature-tag">HTC Vive Focus</span>
-              <span class="feature-tag">Ruang Tracking Luas</span>
-            </div>
-          </div>
-
-          <a href="{{ route('mahasiswa.pilih_unit') }}" class="btn-action-booking">
-            <span>Pesan Sekarang</span>
-          </a>
-        </article>
-
-        <!-- KARTU 3: PUMP IT UP GKM -->
-        <article class="facility-card">
-          <div class="card-thumbnail-wrapper">
-            <img class="card-thumbnail-img" src="https://www.gameroomguys.com/grg-site/item-images/68550_01.jpg" alt="Pump It Up GKM Universitas Brawijaya">
-            <div class="overlay-status-badge">
-              <span class="indicator-dot"></span>
-              <span>Tersedia</span>
-            </div>
-            <div class="overlay-location-footer">Lantai 1 Gedung GKM UB</div>
-          </div>
-
-          <div class="card-body">
-            <h3 class="card-item-title">Pump It Up GKM</h3>
-            <p class="card-item-desc">
-              Mesin arcade dance rhythm interaktif dengan playlist K-Pop, EDM, dan lagu.
-            </p>
-            <div class="card-tags-row">
-              <span class="feature-tag">PIU Phoenix 2024</span>
-              <span class="feature-tag">Dual Stage Pad</span>
-              <span class="feature-tag">Sound System Pro</span>
-            </div>
-          </div>
-
-          <a href="{{ route('mahasiswa.pilih_unit') }}" class="btn-action-booking">
-            <span>Pesan Sekarang</span>
-          </a>
-        </article>
-
+            <a href="{{ route('mahasiswa.pilih_unit', ['fasilitas_id' => $item->id]) }}" class="btn-action-booking">
+              <span>Pesan Sekarang</span>
+            </a>
+          </article>
+        @endforeach
       </div>
 
       <!-- 5. KETENTUAN RESERVASI CALLOUT -->

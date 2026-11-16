@@ -29,6 +29,11 @@
         <!-- Formulir Registrasi (Sesuai Kolom Tabel users) -->
         <form class="login-form-content" action="{{ route('register.submit') }}" method="POST" style="gap: 13px;">
           @csrf
+          @if ($errors->any())
+            <div style="background: #FEE2E2; color: #B91C1C; padding: 10px 12px; border-radius: 10px; font-size: 12px;">
+              {{ $errors->first() }}
+            </div>
+          @endif
 
           <!-- Field Nama Lengkap -->
           <div class="form-group-field">

@@ -7,14 +7,14 @@
 
       <!-- 1. HEADER & TOMBOL BACK KE UI-005 -->
       <header class="topbar-nav-header">
-        <button type="button" class="btn-back-nav" onclick="window.location.href='{{ route('mahasiswa.pilih_jadwal') }}'" title="Kembali ke Pemilihan Jadwal" aria-label="Kembali">
+        <button type="button" class="btn-back-nav" onclick="window.location.href='{{ route('mahasiswa.pilih_jadwal', ['fasilitas_id' => $fasilitas->id, 'unit_kode' => $unitKode, 'unit_nama' => $unitNama, 'tanggal' => $tanggal]) }}'" title="Kembali ke Pemilihan Jadwal" aria-label="Kembali">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
         </button>
         <div class="location-header-title">
-          <h1>Playstation &amp; Xbox Gedung F</h1>
+          <h1>{{ $fasilitas->nama_fasilitas }}</h1>
           <p>
             <span class="status-bullet-green"></span>
             <span>Konfirmasi Data Peminjaman</span>
@@ -50,8 +50,8 @@
               </svg>
             </span>
           </div>
-          <h2 class="card-main-title">PS-01</h2>
-          <span class="card-sub-title">PlayStation 5 Slim</span>
+          <h2 class="card-main-title">{{ $unitKode }}</h2>
+          <span class="card-sub-title">{{ $unitNama }}</span>
         </article>
 
         <!-- Kartu 2: Sesi Waktu -->
@@ -65,14 +65,25 @@
               </svg>
             </span>
           </div>
-          <h2 class="card-main-title">13:00 - 14:00</h2>
-          <span class="card-sub-title">Hari Ini (60 Menit)</span>
+          <h2 class="card-main-title">{{ substr($jadwalSlot->jam_mulai, 0, 5) }} - {{ substr($jadwalSlot->jam_selesai, 0, 5) }}</h2>
+          <span class="card-sub-title">{{ \Carbon\Carbon::parse($tanggal)->format('d M Y') }} (60 Menit)</span>
         </article>
       </section>
 
+      @if ($errors->any())
+        <div style="padding: 12px 16px; margin-bottom: 16px; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #b91c1c; font-size: 13px; font-weight: 500;">
+          {{ $errors->first() }}
+        </div>
+      @endif
+
       <!-- 4. FORMULIR KONFIRMASI DATA PEMINJAM -->
-      <form class="booking-form" id="bookingForm" onsubmit="handleBookingSubmit(event)">
+      <form class="booking-form" id="bookingForm" method="POST" action="{{ route('mahasiswa.booking.store') }}">
         @csrf
+        <input type="hidden" name="fasilitas_id" value="{{ $fasilitas->id }}">
+        <input type="hidden" name="jadwal_slot_id" value="{{ $jadwalSlot->id }}">
+        <input type="hidden" name="unit_kode" value="{{ $unitKode }}">
+        <input type="hidden" name="unit_nama" value="{{ $unitNama }}">
+        <input type="hidden" name="tanggal_reservasi" value="{{ $tanggal }}">
 
         <!-- Field 1: Nama Lengkap (READONLY DARI SSO) -->
         <div class="form-field-group">
@@ -80,7 +91,7 @@
             Nama Lengkap <span class="required-star">*</span>
           </label>
           <div class="input-box-wrapper">
-            <input type="text" id="txtNamaLengkap" name="namaLengkap" class="form-input-readonly has-trailing-badge" value="Kaysan Nawfal Niscal Nasution" readonly>
+            <input type="text" id="txtNamaLengkap" name="namaLengkap" class="form-input-readonly has-trailing-badge" value="{{ Auth::user()->name }}" readonly>
           </div>
         </div>
 
@@ -90,7 +101,7 @@
             Nomor Induk Mahasiswa (NIM) <span class="required-star">*</span>
           </label>
           <div class="input-box-wrapper">
-            <input type="text" id="txtNim" name="nim" class="form-input-readonly" value="255150407111082" readonly>
+            <input type="text" id="txtNim" name="nim" class="form-input-readonly" value="{{ Auth::user()->nim }}" readonly>
           </div>
         </div>
 
@@ -100,7 +111,7 @@
             Email Mahasiswa UB <span class="required-star">*</span>
           </label>
           <div class="input-box-wrapper">
-            <input type="email" id="txtEmail" name="email" class="form-input-readonly has-trailing-icon" value="kaysannasution@student.ub.ac.id" readonly>
+            <input type="email" id="txtEmail" name="email" class="form-input-readonly has-trailing-icon" value="{{ Auth::user()->email }}" readonly>
             <svg class="trailing-icon-static" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="4" width="20" height="16" rx="2"></rect>
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
@@ -117,7 +128,17 @@
           </div>
           <div class="whatsapp-input-container">
             <span class="country-code-pill">+62</span>
-            <input type="tel" id="txtWhatsapp" name="whatsapp" class="input-whatsapp-editable" value="822-7983-5502" placeholder="8xxxxxxxxxx" required autocomplete="tel">
+            @php
+              $initialWa = Auth::user()->no_whatsapp ?? '';
+              if (str_starts_with($initialWa, '+62')) {
+                $initialWa = substr($initialWa, 3);
+              } elseif (str_starts_with($initialWa, '62')) {
+                $initialWa = substr($initialWa, 2);
+              } elseif (str_starts_with($initialWa, '0')) {
+                $initialWa = substr($initialWa, 1);
+              }
+            @endphp
+            <input type="tel" id="txtWhatsapp" name="whatsapp" class="input-whatsapp-editable" value="{{ old('whatsapp', $initialWa) }}" placeholder="8xxxxxxxxxx" required autocomplete="tel">
           </div>
         </div>
 
@@ -134,7 +155,7 @@
         </div>
 
         <label class="agreement-checkbox-wrapper" for="chkAgreement">
-          <input type="checkbox" id="chkAgreement" name="agreement" required>
+          <input type="checkbox" id="chkAgreement" name="agreement" value="1" required>
           <span>
             Saya menyetujui <a href="#syarat-ketentuan" target="_blank" rel="noopener">syarat &amp; tata tertib</a> penggunaan Game Corner Gedung F FILKOM UB.
           </span>
@@ -160,9 +181,9 @@
 @endsection
 
 @push('scripts')
-  <!-- Script Interaktivitas: Timer Countdown & Submit Booking -->
+  <!-- Script Interaktivitas: Timer Countdown -->
   <script>
-    // 1. Script Countdown Timer Sederhana (9 Menit 48 Detik)
+    // Script Countdown Timer Sederhana (9 Menit 48 Detik)
     let totalSeconds = 9 * 60 + 48;
     const timerElement = document.getElementById('countdownTimer');
 
@@ -171,7 +192,7 @@
         clearInterval(countdownInterval);
         timerElement.innerText = "00:00";
         alert("Waktu penahanan slot Anda telah habis. Silakan pilih jadwal kembali.");
-        window.location.href = '{{ route('mahasiswa.pilih_jadwal') }}';
+        window.location.href = "{{ route('mahasiswa.pilih_jadwal', ['fasilitas_id' => $fasilitas->id, 'unit_kode' => $unitKode, 'unit_nama' => $unitNama, 'tanggal' => $tanggal]) }}";
         return;
       }
 
@@ -180,29 +201,5 @@
       const seconds = totalSeconds % 60;
       timerElement.innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }, 1000);
-
-    // 2. Event Handler Submit Form Booking
-    function handleBookingSubmit(event) {
-      event.preventDefault();
-
-      const chkAgreement = document.getElementById('chkAgreement');
-      if (!chkAgreement.checked) {
-        alert("Harap setujui syarat & tata tertib terlebih dahulu.");
-        return;
-      }
-
-      const whatsappNumber = document.getElementById('txtWhatsapp').value.trim();
-      if (!whatsappNumber) {
-        alert("Nomor WhatsApp wajib diisi.");
-        return;
-      }
-
-      // Simpan data kontak WhatsApp ke localStorage
-      localStorage.setItem('bookingWhatsapp', '+62' + whatsappNumber);
-
-      // Berikan notifikasi singkat keberhasilan pengajuan booking
-      alert("Pengajuan reservasi berhasil dikirim! Menunggu persetujuan admin satpam.");
-      window.location.href = '{{ route('mahasiswa.dashboard') }}';
-    }
   </script>
 @endpush

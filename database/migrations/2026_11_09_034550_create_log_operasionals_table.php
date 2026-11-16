@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('log_operasionals', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
+            $table->string('aktivitas');
+            $table->text('detail')->nullable();
             $table->timestamps();
         });
     }

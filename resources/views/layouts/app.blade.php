@@ -19,5 +19,26 @@
   </main>
 
   @stack('scripts')
+
+  <!-- Sinkronisasi Jam Real-Time WIB (Asia/Jakarta) -->
+  <script>
+    (function() {
+      function updateRealtimeClock() {
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat('id-ID', {
+          timeZone: 'Asia/Jakarta',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+        const timeString = formatter.format(now).replace('.', ':') + ' WIB';
+        document.querySelectorAll('.pill-clock span').forEach(function(el) {
+          el.textContent = timeString;
+        });
+      }
+      setInterval(updateRealtimeClock, 1000);
+      updateRealtimeClock();
+    })();
+  </script>
 </body>
 </html>

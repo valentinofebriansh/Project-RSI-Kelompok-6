@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('laporans', function (Blueprint $table) {
             $table->id();
+            $table->string('periode');
+            $table->integer('total_reservasi')->default(0);
+            $table->string('file_rekap')->nullable();
             $table->timestamps();
         });
     }

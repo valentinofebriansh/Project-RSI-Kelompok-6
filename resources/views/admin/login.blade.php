@@ -23,7 +23,12 @@
       <!-- Formulir Kredensial Admin (2 Kolom Vertikal) -->
       <form class="login-form-content" action="{{ route('admin.login.submit') }}" method="POST">
         @csrf
-
+        @if ($errors->any())
+            <div style="background: #FEE2E2; color: #B91C1C; padding: 10px 12px; border-radius: 10px; font-size: 12px;">
+              {{ $errors->first() }}
+            </div>
+          @endif
+          
         <!-- Kolom 1: Email UB Admin -->
         <div class="form-group-field">
           <label for="txtEmailAdmin" class="field-label">Email UB Admin</label>

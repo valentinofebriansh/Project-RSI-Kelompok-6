@@ -37,7 +37,12 @@
         <!-- Formulir Login Mahasiswa -->
         <form class="login-form-content" action="{{ route('login.submit') }}" method="POST">
           @csrf
-
+          @if ($errors->any())
+            <div style="background: #FEE2E2; color: #B91C1C; padding: 10px 12px; border-radius: 10px; font-size: 12px;">
+              {{ $errors->first() }}
+            </div>
+          @endif
+          
           <!-- Field NIM / Email UB -->
           <div class="form-group-field">
             <label for="txtEmailNim" class="field-label">NIM / Email UB</label>
