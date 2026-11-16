@@ -45,7 +45,7 @@
                 <span class="hero-tag">Fasilitas Rekreasi Digital UB</span>
                 <h1 class="hero-title">Reservasi Game Corner Mahasiswa</h1>
                 <p class="hero-subtitle">
-                    Gunakan akun SSO Kampus untuk akses gratis konsol PlayStation 5, Xbox Series X, VR, &amp; Rhythm Dance.
+                    Gunakan akun mahasiswa terdaftar untuk akses gratis konsol PlayStation 5, Xbox Series X, VR, &amp; Rhythm Dance.
                 </p>
             </section>
 
