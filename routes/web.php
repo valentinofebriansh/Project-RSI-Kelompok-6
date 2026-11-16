@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => view('welcome'))->name('home');
 Route::get('/login', fn () => view('auth.login'))->name('login');
-Route::post('/login', fn () => redirect()->route('mahasiswa.dashboard'));
+Route::post('/login', fn () => redirect()->route('mahasiswa.dashboard'))->name('login.submit');
+Route::get('/register', fn () => view('auth.register'))->name('register');
+Route::post('/register', fn () => redirect()->route('mahasiswa.dashboard'))->name('register.submit');
 Route::post('/logout', fn () => redirect()->route('home'))->name('logout');
 
 Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {

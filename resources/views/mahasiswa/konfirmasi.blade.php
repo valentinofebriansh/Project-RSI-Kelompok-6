@@ -90,7 +90,7 @@
             Nomor Induk Mahasiswa (NIM) <span class="required-star">*</span>
           </label>
           <div class="input-box-wrapper">
-            <input type="text" id="txtNim" name="nim" class="form-input-readonly" value="255150407111081" readonly>
+            <input type="text" id="txtNim" name="nim" class="form-input-readonly" value="255150407111082" readonly>
           </div>
         </div>
 
