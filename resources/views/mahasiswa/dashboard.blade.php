@@ -6,16 +6,18 @@
     <!-- 1. LAYAR UTAMA: DASHBOARD PENGGUNA TERAUTENTIKASI (UI-003.1) -->
     <div class="scrollable-content" id="dashboardContent">
 
-      <!-- 1. TOPBAR PENGGUNA TERAUTENTIKASI (Kaysan Nawfal) -->
+      <!-- 1. TOPBAR PENGGUNA TERAUTENTIKASI -->
       <header class="topbar-header-auth">
-        <div class="avatar-initial-circle">
-          <span>{{ collect(explode(' ', $user->name))->map(fn($n) => strtoupper(substr($n, 0, 1)))->take(2)->implode('') }}</span>
-          <span class="status-indicator-dot"></span>
-        </div>
-        <div class="user-details">
-          <span class="greeting-small">Selamat Datang,</span>
-          <strong class="user-fullname">{{ $user->name }}</strong>
-          <span class="user-nim">NIM: {{ $user->nim }}</span>
+        <div class="user-profile-meta">
+          <div class="avatar-initial-circle">
+            <span>{{ strtoupper(substr(Auth::user()->name ?? 'M', 0, 1)) }}</span>
+            <span class="status-indicator-dot"></span>
+          </div>
+          <div class="user-details">
+            <span class="greeting-small">Selamat Datang,</span>
+            <strong class="user-fullname">{{ Auth::user()->name ?? 'Mahasiswa' }}</strong>
+            <span class="user-nim">NIM: {{ Auth::user()->nim ?? '-' }}</span>
+          </div>
         </div>
 
         <!-- Tombol Logout: Membuka Popup Konfirmasi Logout (UI-003) -->
