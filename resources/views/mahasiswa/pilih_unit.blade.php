@@ -80,6 +80,10 @@
         <div class="unit-card-grid">
 
           @foreach ($fasilitas->units ?? [] as $index => $u)
+          @php
+            $statusUnit = $unitsStatus[$u['kode']] ?? ['sisa_slot' => 0, 'is_penuh' => false];
+            $isPenuh = $statusUnit['is_penuh'];
+          @endphp
           <article class="unit-card {{ $index === 0 ? 'is-selected' : 'is-dimmed' }}"
                    id="card-{{ strtolower(str_replace('-', '', $u['kode'])) }}"
                    onclick="selectUnit('card-{{ strtolower(str_replace('-', '', $u['kode'])) }}', '{{ $u['kode'] }} ({{ $u['nama'] }})', '{{ $u['kode'] }}', '{{ $u['nama'] }}')">
@@ -115,8 +119,8 @@
               @endif
             </div>
             <div class="unit-status-indicator">
-              <span class="status-dot"></span>
-              <span>Tersedia</span>
+              <span class="status-dot" style="background-color: {{ $isPenuh ? '#EF4444' : '#10B981' }};"></span>
+              <span>{{ $isPenuh ? 'Penuh Hari Ini' : 'Tersedia (' . $statusUnit['sisa_slot'] . ' Sesi)' }}</span>
             </div>
             <button type="button" class="btn-select-unit">Pilih</button>
           </article>
@@ -158,7 +162,6 @@
 @endsection
 
 @push('scripts')
-  <!-- Script Interaktivitas Pemilihan Unit Konsol Tunggal -->
   <script>
     let selectedUnitKode = "{{ $fasilitas->units[0]['kode'] ?? 'PS-01' }}";
     let selectedUnitNama = "{{ $fasilitas->units[0]['nama'] ?? 'PlayStation 5' }}";
@@ -177,7 +180,6 @@
         }
       });
 
-      // Perbarui label ringkasan unit terpilih pada bar bawah
       document.getElementById('lblSelectedUnit').innerText = unitDisplayName;
       selectedUnitKode = unitKode;
       selectedUnitNama = unitNama;

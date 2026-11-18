@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -22,7 +27,6 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Deteksi otomatis apakah input berupa Email UB atau NIM
         $loginField = filter_var($request->email, FILTER_VALIDATE_EMAIL) ? 'email' : 'nim';
 
         $credentials = [
@@ -70,10 +74,12 @@ class AuthController extends Controller
             'role' => 'mahasiswa',
         ]);
 
+        event(new Registered($user));
+
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('mahasiswa.dashboard');
+        return redirect()->route('verification.notice');
     }
 
     public function logout(Request $request)
@@ -83,6 +89,73 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('home');
+    }
+
+    // --- VERIFIKASI EMAIL ---
+    public function showVerifyNotice()
+    {
+        return view('auth.verify-email');
+    }
+
+    public function verifyEmail(EmailVerificationRequest $request)
+    {
+        $request->fulfill();
+        return redirect()->route('mahasiswa.dashboard')->with('success', 'Email berhasil diverifikasi!');
+    }
+
+    public function resendVerification(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()->route('mahasiswa.dashboard');
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('status', 'Link verifikasi baru telah dikirim ke email kamu.');
+    }
+
+    // --- RESET PASSWORD VIA EMAIL ---
+    public function showForgotPassword()
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function sendResetLink(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $status = Password::sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with('status', 'Link reset password sudah dikirim ke email kamu!')
+            : back()->withErrors(['email' => 'Email tidak ditemukan atau gagal mengirim email.']);
+    }
+
+    public function showResetPassword(Request $request, $token)
+    {
+        return view('auth.reset-password', ['token' => $token, 'email' => $request->email]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->setRememberToken(Str::random(60));
+                $user->save();
+                event(new PasswordReset($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('login')->with('status', 'Password berhasil direset! Silakan login.')
+            : back()->withErrors(['email' => 'Token reset password tidak valid atau sudah kedaluwarsa.']);
     }
 
     // --- ADMIN ---
