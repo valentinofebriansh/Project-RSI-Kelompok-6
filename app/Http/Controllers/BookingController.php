@@ -23,7 +23,6 @@ class BookingController extends Controller
             ->orderBy('tanggal_reservasi')
             ->get();
 
-        // Reservasi terbaru untuk hari ini atau mendatang (termasuk pending, disetujui, maupun ditolak)
         $latestReservasi = Reservasi::with(['fasilitas', 'jadwalSlot'])
             ->where('user_id', $user->id)
             ->whereDate('tanggal_reservasi', '>=', now()->toDateString())
@@ -42,7 +41,32 @@ class BookingController extends Controller
             ? Fasilitas::findOrFail($request->fasilitas_id)
             : Fasilitas::firstOrFail();
 
-        return view('mahasiswa.pilih_unit', compact('fasilitas'));
+        $tanggal = $request->input('tanggal', now()->toDateString());
+        $totalSlotAktif = JadwalSlot::where('is_aktif', true)->count();
+
+        // Hitung jumlah slot terisi per unit_kode pada tanggal tersebut agar status VR & PS tidak saling nyantol
+        $bookingPerUnit = Reservasi::where('fasilitas_id', $fasilitas->id)
+            ->whereDate('tanggal_reservasi', $tanggal)
+            ->whereIn('status', ['pending', 'disetujui'])
+            ->selectRaw('unit_kode, COUNT(*) as total_terisi')
+            ->groupBy('unit_kode')
+            ->pluck('total_terisi', 'unit_kode')
+            ->toArray();
+
+        $unitsStatus = [];
+        foreach ($fasilitas->units ?? [] as $u) {
+            $kode = $u['kode'];
+            $terisi = $bookingPerUnit[$kode] ?? 0;
+            $sisaSlot = max(0, $totalSlotAktif - $terisi);
+
+            $unitsStatus[$kode] = [
+                'terisi' => $terisi,
+                'sisa_slot' => $sisaSlot,
+                'is_penuh' => ($totalSlotAktif > 0 && $sisaSlot === 0),
+            ];
+        }
+
+        return view('mahasiswa.pilih_unit', compact('fasilitas', 'unitsStatus', 'tanggal'));
     }
 
     public function pilihJadwal(Request $request)
@@ -51,16 +75,20 @@ class BookingController extends Controller
             ? Fasilitas::findOrFail($request->fasilitas_id)
             : Fasilitas::firstOrFail();
 
-        $units = $fasilitas->units ?? [];
-        $defaultUnit = $units[0] ?? ['kode' => 'PS-01', 'nama' => 'PlayStation 5'];
+        $units = collect($fasilitas->units ?? []);
+        $requestedKode = $request->input('unit_kode');
 
-        $unit_kode = $request->input('unit_kode', $defaultUnit['kode']);
-        $unit_nama = $request->input('unit_nama', $defaultUnit['nama']);
+        $selectedUnit = $units->firstWhere('kode', $requestedKode)
+            ?? $units->first()
+            ?? ['kode' => 'PS-01', 'nama' => 'PlayStation 5'];
+
+        $unit_kode = $selectedUnit['kode'];
+        $unit_nama = $request->input('unit_nama', $selectedUnit['nama']);
         $tanggal = $request->input('tanggal', now()->toDateString());
 
         $jadwalSlots = JadwalSlot::where('is_aktif', true)->orderBy('sesi_ke')->get();
 
-        // Cek slot yang sudah dipesan orang lain pada fasilitas, unit, & tanggal yang sama
+        // Filter ketat HANYA untuk unit_kode yang dipilih
         $bookedSlotIds = Reservasi::where('fasilitas_id', $fasilitas->id)
             ->where('unit_kode', $unit_kode)
             ->whereDate('tanggal_reservasi', $tanggal)
@@ -68,7 +96,6 @@ class BookingController extends Controller
             ->pluck('jadwal_slot_id')
             ->toArray();
 
-        // Jika $tanggal === now()->toDateString(), tandai sesi yang jam_selesai-nya sudah terlewat
         $pastSlotIds = [];
         if ($tanggal === now()->toDateString()) {
             $currentWibTime = now()->format('H:i:s');
@@ -139,7 +166,6 @@ class BookingController extends Controller
 
         $user = Auth::user();
 
-        // ATURAN KUOTA: Maksimal 1x booking per hari per mahasiswa (hanya status pending/disetujui/selesai)
         $sudahBookingHariIni = Reservasi::where('user_id', $user->id)
             ->whereDate('tanggal_reservasi', $validated['tanggal_reservasi'])
             ->whereIn('status', ['pending', 'disetujui', 'selesai'])
@@ -151,7 +177,6 @@ class BookingController extends Controller
             ]);
         }
 
-        // Cek bentrok slot unit yang sama pada tanggal & slot tersebut
         $slotTerisi = Reservasi::where('fasilitas_id', $validated['fasilitas_id'])
             ->where('unit_kode', $validated['unit_kode'])
             ->whereDate('tanggal_reservasi', $validated['tanggal_reservasi'])
@@ -165,7 +190,6 @@ class BookingController extends Controller
             ]);
         }
 
-        // Update nomor WA user jika diubah
         $user->update(['no_whatsapp' => $validated['whatsapp']]);
 
         Reservasi::create([

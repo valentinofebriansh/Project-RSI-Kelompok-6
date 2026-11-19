@@ -3,16 +3,13 @@
 @section('title', 'Halaman Login Mahasiswa - Game Corner FILKOM UB')
 
 @section('content')
-    <!-- 1. LATAR BELAKANG: SELURUH KONTEN WELCOME.BLADE.PHP (BLUR & DIM) -->
     <div class="scrollable-content background-screen-blurred" aria-hidden="true">
       @include('partials.welcome_content')
     </div>
 
-    <!-- 2. MODAL OVERLAY: DIALOG LOGIN MAHASISWA -->
     <section class="modal-backdrop-overlay" id="modalLoginMahasiswa" data-home-url="{{ route('home') }}" role="dialog" aria-modal="true" aria-labelledby="loginTitle" style="padding: 64px 16px 32px 16px; overflow-y: auto; cursor: pointer;">
       <div class="modal-login-card" style="cursor: default;">
 
-        <!-- Tombol Tutup (X) Mengembalikan ke Halaman Utama -->
         <button type="button" class="btn-close-modal" data-href="{{ route('home') }}" onclick="window.location.href=this.dataset.href" id="btnCloseModal" aria-label="Tutup Dialog Login">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -20,7 +17,6 @@
           </svg>
         </button>
 
-        <!-- Icon Shield & Identitas Akun -->
         <div class="shield-icon-wrapper">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
@@ -34,16 +30,20 @@
           Masuk dengan akun Game Corner terdaftar Anda untuk melakukan reservasi fasilitas.
         </p>
 
-        <!-- Formulir Login Mahasiswa -->
         <form class="login-form-content" action="{{ route('login.submit') }}" method="POST">
           @csrf
+          @if (session('status'))
+            <div style="background: #DCFCE7; color: #166534; padding: 10px 12px; border-radius: 10px; font-size: 12px;">
+              {{ session('status') }}
+            </div>
+          @endif
+
           @if ($errors->any())
             <div style="background: #FEE2E2; color: #B91C1C; padding: 10px 12px; border-radius: 10px; font-size: 12px;">
               {{ $errors->first() }}
             </div>
           @endif
           
-          <!-- Field NIM / Email UB -->
           <div class="form-group-field">
             <label for="txtEmailNim" class="field-label">NIM / Email UB</label>
             <div class="input-icon-container">
@@ -55,7 +55,6 @@
             </div>
           </div>
 
-          <!-- Field Password -->
           <div class="form-group-field">
             <label for="txtPassword" class="field-label">Password</label>
             <div class="input-icon-container">
@@ -73,20 +72,20 @@
             </div>
           </div>
 
-          <!-- Pilihan Ingat Saya -->
-          <div class="form-options-row">
+          <div class="form-options-row" style="display: flex; justify-content: space-between; align-items: center;">
             <label class="remember-me-checkbox">
               <input type="checkbox" id="chkRememberMe" name="remember">
               <span>Ingat Saya</span>
             </label>
+            <a href="{{ route('password.request') }}" style="font-family: var(--font-caption); font-size: 12px; font-weight: 600; color: var(--primary-500); text-decoration: none;">
+              Lupa Password?
+            </a>
           </div>
 
-          <!-- Tombol Masuk -->
           <button type="submit" class="btn-submit-sso" id="btnSubmitLogin">
             <span>Masuk</span>
           </button>
 
-          <!-- Pemisah & Tombol Arahkan ke Halaman Daftar -->
           <div style="margin-top: 2px; padding-top: 14px; border-top: 1px solid #F0F0F0; display: flex; flex-direction: column; gap: 8px; text-align: center;">
             <span style="font-family: var(--font-caption); font-size: 12px; color: var(--neutral-600);">
               Belum punya akun Game Corner?
@@ -96,7 +95,6 @@
             </a>
           </div>
 
-          <!-- Disclaimer Mahasiswa Aktif FILKOM -->
           <div class="disclaimer-box">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
@@ -126,7 +124,6 @@
       btnTogglePassword.style.color = isPassword ? '#160BB6' : '#585860';
     });
 
-    // Klik pada area blur di luar kotak modal akan kembali ke welcome.blade.php
     modalLoginBackdrop.addEventListener('click', (event) => {
       if (!modalLoginCard.contains(event.target)) {
         window.location.href = modalLoginBackdrop.dataset.homeUrl;
